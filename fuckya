@@ -1,0 +1,162 @@
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Moonlight Hub",
+    LoadingTitle = "Moonlight Hub Loading",
+    LoadingSubtitle = "by Dig to Earth's Core",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "MoonlightHub", -- Change if needed
+        FileName = "Settings"
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = true,
+    KeySettings = {
+        Title = "Moonlight Hub",
+        Subtitle = "Key System",
+        Note = "The Key is '1234' or '5678'",
+        FileName = "MoonlightKey",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = { "1234", "5678" }
+    }
+})
+
+local Tabs = {
+    Main = Window:CreateTab("Main", 4483362458),
+    Teleport = Window:CreateTab("Teleport", 4483360729),
+    Pets = Window:CreateTab("Pets", 4483362565),
+    Settings = Window:CreateTab("Settings", 4483361552),
+    Theme = Window:CreateTab("Theme", 4483360407)
+}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+-- Infinite Cash
+Tabs.Main:CreateButton({
+    Name = "Infinite Cash",
+    Callback = function()
+        local event = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("AddRewardEvent")
+        if event then event:FireServer("Cash", math.huge) end
+    end
+})
+
+-- Infinite Gems
+Tabs.Main:CreateButton({
+    Name = "Infinite Gems",
+    Callback = function()
+        local event = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("AddRewardEvent")
+        if event then event:FireServer("Gems", math.huge) end
+    end
+})
+
+-- Legit Farm Toggle
+local AutoDig = LocalPlayer:FindFirstChild("AutoDig")
+if AutoDig then
+    Tabs.Main:CreateToggle({
+        Name = "Legit Farm",
+        CurrentValue = false,
+        Callback = function(state)
+            AutoDig.Value = state
+        end
+    })
+end
+
+-- Blatant Farm
+local isFarming = false
+local selectedWorld = "World1"
+
+Tabs.Main:CreateDropdown({
+    Name = "Select World (Blatant Farm)",
+    Options = {"World1", "World2", "World3", "World4", "World5", "World6", "World7", "World8", "World9", "World10"},
+    CurrentOption = "World1",
+    Callback = function(Option)
+        selectedWorld = Option
+    end
+})
+
+Tabs.Main:CreateToggle({
+    Name = "Blatant Farm",
+    CurrentValue = false,
+    Callback = function(value)
+        isFarming = value
+        task.spawn(function()
+            while isFarming do
+                local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                local world = Workspace:FindFirstChild(selectedWorld)
+                local winPart = world and world:FindFirstChild("WinPart")
+                if hrp and winPart then
+                    hrp.CFrame = winPart.CFrame + Vector3.new(0, 12.5, 0)
+                end
+                task.wait(0.05)
+            end
+        end)
+    end
+})
+
+-- Teleport to Worlds
+local worldPos = {
+    ["World 1"] = Vector3.new(15, -400, 0),
+    ["World 2"] = Vector3.new(42, -400, -1048),
+    ["World 3"] = Vector3.new(21, -400, -2004),
+    ["World 4"] = Vector3.new(-6, -400, -3010),
+    ["World 5"] = Vector3.new(-1, -400, -4000),
+    ["World 6"] = Vector3.new(0, -400, -5000),
+    ["World 7"] = Vector3.new(0, -400, -6000),
+    ["World 8"] = Vector3.new(0, -400, -7000),
+    ["World 9"] = Vector3.new(0, -400, -8000),
+    ["World 10"] = Vector3.new(0, -400, -9000),
+}
+
+for i = 1, 10 do
+    local name = "World " .. i
+    local pos = worldPos[name]
+
+    Tabs.Teleport:CreateButton({
+        Name = name,
+        Callback = function()
+            local remote = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("WorldTeleportEvent")
+            if remote then
+                remote:FireServer(i)
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if hrp and pos then
+                    hrp.CFrame = CFrame.new(pos + Vector3.new(0, 1550, 0))
+                end
+            end
+        end
+    })
+end
+
+-- Pets Input
+local function createPetInput(title, eventName, arg)
+    Tabs.Pets:CreateInput({
+        Name = title,
+        PlaceholderText = "Amount",
+        RemoveTextAfterFocusLost = false,
+        Callback = function(value)
+            for i = 1, tonumber(value) or 0 do
+                local remote = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild(eventName)
+                if remote then
+                    remote:FireServer(arg)
+                    task.wait()
+                end
+            end
+        end
+    })
+end
+
+createPetInput("Triple Dominus (50x)", "SpinPrizeEvent", 4)
+createPetInput("Diamond Cosmic Alien (180x)", "PetCageEvent", "Diamond Cosmic Alien")
+createPetInput("Void Angel (100x)", "PetCageEvent", "Void Angel")
+
+-- Theme tab
+Tabs.Theme:CreateParagraph({Title = "Customization", Content = "Use Rayfield's built-in config save to store theme."})
+
+-- You can also add Colorpickers and Window Transparency manually using Rayfield v4 APIs
