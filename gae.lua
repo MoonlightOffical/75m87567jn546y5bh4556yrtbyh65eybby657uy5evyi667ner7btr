@@ -88,7 +88,7 @@ GearTab:CreateButton({
     Callback = function()
         local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
         if hrp then
-            hrp.CFrame = CFrame.new(Vector3.new(-105.13, 1.4, -10.53))
+            hrp.CFrame = CFrame.new(Vector3.new(-104.78, 4.4, -11.4))
             Rayfield:Notify({
                 Title = "Teleported",
                 Content = "You have been teleported to the Harvest Event!",
