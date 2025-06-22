@@ -12,7 +12,7 @@ local Window = Rayfield:CreateWindow({
     Discord = {
         Enabled = false
     },
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
         Title = "Moonlight Hub",
         Subtitle = "Key System",
