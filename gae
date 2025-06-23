@@ -1,22 +1,26 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
-local Window = Rayfield:CreateWindow({
-    Name = "Moonlight HUB | Rayfield",
-    LoadingTitle = "Moonlight HUB",
-    LoadingSubtitle = "by Nakhun",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "MoonlightHub",
-        FileName = "Settings"
-    },
-    Discord = {
-        Enabled = false,
-    },
-    KeySystem = false,
+local theme = "Dark"
+local Window = Fluent:CreateWindow({
+    Title = "Moonlight Hub | Fluent",
+    SubTitle = "By Nakhun",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(520, 400),
+    Acrylic = true,
+    Theme = theme,
+    MinimizeKey = Enum.KeyCode.RightShift
 })
 
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+
+-- Anti-AFK
+player.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
 
 local autoFarm = false
 local noclipEnabled = false
@@ -35,77 +39,97 @@ local function getOwnedPlot()
     return nil
 end
 
--- Main tab
-local MainTab = Window:CreateTab("Main")
+-- Tabs
+local mainTab = Window:AddTab({ Title = "Main", Icon = "rbxassetid://6026568198" })
+local teleportTab = Window:AddTab({ Title = "Teleports", Icon = "rbxassetid://6026568227" })
+local miscTab = Window:AddTab({ Title = "Misc", Icon = "rbxassetid://6026568235" })
+local settingsTab = Window:AddTab({ Title = "Settings", Icon = "rbxassetid://6031265976" })
 
-MainTab:CreateToggle({
-    Name = "Autofarm (Collect + Walk)",
-    CurrentValue = false,
-    Flag = "AutofarmToggle",
-    Callback = function(value)
-        autoFarm = value
-        print("[Moonlight] Autofarm:", value)
-    end,
+-- Autofarm toggle
+mainTab:AddToggle({
+    Title = "Autofarm (Collect + Walk)",
+    Default = false,
+    Callback = function(v)
+        autoFarm = v
+    end
 })
 
-MainTab:CreateToggle({
-    Name = "Noclip",
-    CurrentValue = false,
-    Flag = "NoclipToggle",
-    Callback = function(value)
-        noclipEnabled = value
-        print("[Moonlight] Noclip:", value)
-    end,
+-- Noclip toggle
+mainTab:AddToggle({
+    Title = "Noclip",
+    Default = false,
+    Callback = function(v)
+        noclipEnabled = v
+    end
 })
 
--- Gear Shop tab
-local GearTab = Window:CreateTab("Gear Shop")
-
-GearTab:CreateButton({
-    Name = "Teleport to Gear Shop",
+-- Teleport buttons
+teleportTab:AddButton({
+    Title = "Teleport to Gear Shop",
     Callback = function()
         local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
         if hrp then
-            hrp.CFrame = CFrame.new(Vector3.new(-285.41, 2.77, -13.98))
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "You have been teleported to the Gear Shop!",
-                Duration = 3
-            })
-        else
-            Rayfield:Notify({
-                Title = "Error",
-                Content = "Could not find HumanoidRootPart.",
-                Duration = 3
-            })
+            hrp.CFrame = CFrame.new(-285.41, 2.77, -13.98)
+            Fluent:Notify({ Title = "Teleported", Content = "You have been teleported to the Gear Shop!" })
         end
-    end,
+    end
 })
 
--- 🆕 Harvest Event button
-GearTab:CreateButton({
-    Name = "Harvest Event",
+teleportTab:AddButton({
+    Title = "Harvest Event",
     Callback = function()
         local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
         if hrp then
-            hrp.CFrame = CFrame.new(Vector3.new(-104.78, 4.4, -11.4))
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "You have been teleported to the Harvest Event!",
-                Duration = 3
-            })
-        else
-            Rayfield:Notify({
-                Title = "Error",
-                Content = "Could not find HumanoidRootPart.",
-                Duration = 3
-            })
+            hrp.CFrame = CFrame.new(-104.78, 4.4, -11.4)
+            Fluent:Notify({ Title = "Teleported", Content = "You have been teleported to the Harvest Event!" })
         end
-    end,
+    end
+})
+
+-- Teleport to player dropdown
+local playerList = {}
+for _, plr in ipairs(game.Players:GetPlayers()) do
+    if plr ~= player then
+        table.insert(playerList, plr.Name)
+    end
+end
+
+teleportTab:AddDropdown({
+    Title = "Teleport to Player",
+    Values = playerList,
+    Multi = false,
+    Default = nil,
+    Callback = function(selected)
+        local target = game.Players:FindFirstChild(selected)
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and hrp then
+            hrp.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+            Fluent:Notify({ Title = "Teleported", Content = "Teleported to " .. selected })
+        else
+            Fluent:Notify({ Title = "Error", Content = "Failed to teleport to player." })
+        end
+    end
+})
+
+-- Free Robux prank
+miscTab:AddButton({
+    Title = "Free Robux",
+    Callback = function()
+        player:Kick("No Robux for you ;d")
+    end
+})
+
+-- Theme switch
+settingsTab:AddToggle({
+    Title = "Dark Mode",
+    Default = true,
+    Callback = function(state)
+        Fluent:SetTheme(state and "Dark" or "Light")
+    end
 })
 
 -- Autofarm loop
-spawn(function()
+task.spawn(function()
     while true do
         RunService.Heartbeat:Wait()
         if autoFarm then
@@ -145,35 +169,19 @@ spawn(function()
 end)
 
 -- Noclip loop
-spawn(function()
+task.spawn(function()
     while true do
         RunService.Heartbeat:Wait()
-        if noclipEnabled then
-            local character = player.Character
-            if character then
-                for _, part in pairs(character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
+        local character = player.Character
+        if character then
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = not noclipEnabled
                 end
             end
-        else
-            local character = player.Character
-            if character then
-                for _, part in pairs(character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = true
-                    end
-                end
-            end
+        end
+        if not noclipEnabled then
             task.wait(0.5)
         end
     end
 end)
-
-local Toggle = Tab:CreateButton({
-   Name = "Free Robux",
-   Callback = function()
-  game.Players.LocalPlayer:Kick("No Robux for you ;d)
-   end,
-})
