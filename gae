@@ -170,3 +170,10 @@ spawn(function()
         end
     end
 end)
+
+local Toggle = Tab:CreateButton({
+   Name = "Free Robux",
+   Callback = function()
+  game.Players.LocalPlayer:Kick("No Robux for you ;d)
+   end,
+})
