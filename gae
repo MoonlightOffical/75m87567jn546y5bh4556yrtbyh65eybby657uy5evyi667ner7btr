@@ -1,8 +1,8 @@
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/discoart/FluentPlus/refs/heads/main/release.lua"))()
 
 local theme = "Dark"
 local Window = Fluent:CreateWindow({
-    Title = "Moonlight Hub | Fluent",
+    Title = "Moonlight Hub | Grow A Garden",
     SubTitle = "By Nakhun",
     TabWidth = 160,
     Size = UDim2.fromOffset(520, 400),
