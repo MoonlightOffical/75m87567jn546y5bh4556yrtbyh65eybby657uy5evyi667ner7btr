@@ -1,0 +1,32 @@
+-- ⬇️ FluentPlus load (already in your script)
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/discoart/FluentPlus/refs/heads/main/release.lua"))()
+local UI = Fluent:CreateWindow({
+    Title = "Moonlight Hub | FluentPlus",
+    SubTitle = "Draggable Launcher",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(520, 400),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightShift
+})
+
+-- ⬇️ Create draggable icon button
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "FluentLauncher"
+
+local IconButton = Instance.new("ImageButton")
+IconButton.Parent = ScreenGui
+IconButton.Size = UDim2.new(0, 48, 0, 48)
+IconButton.Position = UDim2.new(0, 50, 0, 50)
+IconButton.BackgroundTransparency = 1
+IconButton.Image = "rbxassetid://11280510509" -- Roblox logo or change to your custom logo
+IconButton.ScaleType = Enum.ScaleType.Fit
+IconButton.Active = true
+IconButton.Draggable = true
+
+-- Toggle Fluent UI on click
+local visible = true
+IconButton.MouseButton1Click:Connect(function()
+    visible = not visible
+    UI:SetVisibility(visible)
+end)
